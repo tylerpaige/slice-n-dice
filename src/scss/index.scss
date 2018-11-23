@@ -58,9 +58,32 @@ POSITIONING
 ANIMATIONS
 =====================
 */
-$shakeMaxAmount : 1%;
-$totalDuration : 3s;
-$waveDuration : 1s;
+/*
+if the total duration is 3 seconds,
+and the delay per panel is 0.1s,
+and there are 50 panels,
+the 50th panel begins 5s after the first one. 
+
+so if i want the wave to go across the entire screen,
+then wait t seconds, what do all the various pieces have to be?
+
+the wave moving across the screen should take 3s, let's say.
+the means the $delay * $numberOfPanels + $waveDuration = 3
+
+Then we should wait 3s before looping...
+
+so the totalDuration should be...
+$waitTime + $waveDurtion + $delay * $numberOfPanels
+*/
+
+$delay: 0.1s;
+$waveDuration : 5s;
+$waitTime: 5;
+$maxAmplitude : 30%;
+
+$totalDuration : $waitTime + $waveDuration + $delay * $numberOfPanels;
+$wavePortion : $waveDuration / $totalDuration * 100;
+
 @function dampedSineWave($x) {
   // @return sin(pow($x - $xOffset, 2)) / pow($x, 1.25);
   // @return sin($x) / $x;
@@ -71,43 +94,35 @@ $waveDuration : 1s;
   @return ($a / ($b + $x)) * sin((2 * $PI / $c) * $x) + $d; 
 }
 @function sineWave($i, $totalSteps : 100) {
-  $x : $i / $totalSteps * $PI;
+  $x : ($i / $totalSteps) * $PI * 2;
+  @return sin($x);
+}
+@function sineArc($i, $totalSteps : 100) {
+  $x : ($i / $totalSteps) * $PI;
   @return sin($x);
 }
 .panel {
   animation-name: shake;
   animation-duration: $totalDuration;
   animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
   animation-timing-function: linear;
 }
 @for $n from 1 through $numberOfPanels {
-  $delay : 0.1s * $n;
   .panel:nth-child(#{$n}) {
-    animation-delay: $delay;
+    animation-delay: $n * $delay;
   }
 }
+
 @keyframes shake {
-  @for $i from 1 through 100 {
-    $translateY : sineWave($i) * -10%;
+  @for $i from 1 through $wavePortion {
+    $translateY : sineArc($i, $wavePortion) * -1 * $maxAmplitude;
 
     #{$i}% {
       transform: scale(1 / $numberOfPanels, 1) translateY(#{$translateY});
     }
   }
 }
-// $waveApexPercentage : ($waveDuration / 2) / $totalDuration * 100;
-// $waveZenithPercentage : $waveDuration / $totalDuration * 100;
-// @keyframes shake {
-//   0% {
-//     transform: scale(1 / $numberOfPanels, 1) translateY(0);
-//   }
-//   #{$waveApexPercentage}% {
-//     transform: scale(1 / $numberOfPanels, 1) translateY($shakeMaxAmount * -1);
-//   }
-//   #{$waveZenithPercentage}% {
-//     transform: scale(1 / $numberOfPanels, 1) translateY(0);
-//   }
-// }
 
 /*
 =====================
@@ -145,6 +160,5 @@ h3 {
 }
 span {
   background-color: #4ae4c3;
-  mix-blend-mode: difference;
   padding: 0.23em 0.35em 0;
 }
