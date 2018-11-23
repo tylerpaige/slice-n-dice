@@ -1,0 +1,129 @@
+@import '~reset-css';
+@import '~mathsass';
+
+$numberOfPanels : 50;
+$colorPairs : (#B95E82, #B95E52), (#54ACC7, #9DB1FC), (#ADA13E, #5EA13E), (#173AFF, #9B3AFF);
+
+@mixin fullbleed() {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.container {
+  @include fullbleed();
+}
+
+.panel,
+.panel__inner {
+  @include fullbleed();
+}
+
+.panel {
+  transform: scale(1 / $numberOfPanels, 1);
+  overflow: hidden;
+}
+.panel__inner {
+  transform: scale($numberOfPanels, 1);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+
+/*
+=====================
+POSITIONING
+=====================
+*/
+@for $n from 1 through $numberOfPanels {
+  .panel:nth-child(#{$n}) {
+    &,
+    & .panel__inner {
+      transform-origin: (100% * ($n - 1) / ($numberOfPanels - 1)) 50%;
+    }
+  }
+}
+
+/*
+=====================
+ANIMATIONS
+=====================
+*/
+
+$shakeMaxAmount : 1%;
+$totalDuration : 5s;
+$waveDuration : 1s;
+.panel {
+  animation-name: shake;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+@for $n from 1 through $numberOfPanels {
+  $delay : 0.1s * $n;
+  .panel:nth-child(#{$n}) {
+    animation-delay: $delay;
+  }
+}
+$waveApexPercentage : ($waveDuration / 2) / $totalDuration * 100;
+$waveZenithPercentage : $waveDuration / $totalDuration * 100;
+@keyframes shake {
+  0% {
+    transform: scale(1 / $numberOfPanels, 1) translateY(0);
+  }
+  #{$waveApexPercentage}% {
+    transform: scale(1 / $numberOfPanels, 1) translateY($shakeMaxAmount * -1);
+  }
+  #{$waveZenithPercentage}% {
+    transform: scale(1 / $numberOfPanels, 1) translateY(0);
+  }
+}
+
+/*
+=====================
+COLOR CODING
+=====================
+*/
+
+@for $n from 1 through $numberOfPanels {
+  $index : ($n % length($colorPairs)) + 1;
+  $colorPair : nth($colorPairs, $index);
+  $colorA : nth($colorPair, 1);
+  $colorB : nth($colorPair, 2);
+  .panel:nth-child(#{$n}) {
+    background-color: $colorA;
+  }
+}
+
+/*
+=====================
+TYPOGRAPHY
+=====================
+*/
+
+.container {
+  font-family: sans-serif;
+  text-align: center;
+}
+h1 {
+  font-size: 13.5vw;
+  font-weight: bold;
+}
+h3 { 
+  font-size: 5vw;
+  font-weight: bold;
+}
+span {
+  background-color: #4ae4c3;
+  mix-blend-mode: difference;
+  padding: 0.23em 0.35em 0;
+}
