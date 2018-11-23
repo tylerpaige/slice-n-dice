@@ -60,11 +60,20 @@ ANIMATIONS
 */
 
 $shakeMaxAmount : 1%;
-$totalDuration : 5s;
+$totalDuration : 15s;
 $waveDuration : 1s;
+@function dampedSineWave($x) {
+  // @return sin(pow($x - $xOffset, 2)) / pow($x, 1.25);
+  // @return sin($x) / $x;
+  $a : 2.4;
+  $b : 1;
+  $c : 10;
+  $d : 0;
+  @return ($a / ($b + $x)) * sin((2 * $PI / $c) * $x) + $d; 
+}
 .panel {
   animation-name: shake;
-  animation-duration: 2s;
+  animation-duration: $totalDuration;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
 }
@@ -74,19 +83,34 @@ $waveDuration : 1s;
     animation-delay: $delay;
   }
 }
-$waveApexPercentage : ($waveDuration / 2) / $totalDuration * 100;
-$waveZenithPercentage : $waveDuration / $totalDuration * 100;
 @keyframes shake {
-  0% {
-    transform: scale(1 / $numberOfPanels, 1) translateY(0);
-  }
-  #{$waveApexPercentage}% {
-    transform: scale(1 / $numberOfPanels, 1) translateY($shakeMaxAmount * -1);
-  }
-  #{$waveZenithPercentage}% {
-    transform: scale(1 / $numberOfPanels, 1) translateY(0);
+  @for $i from 1 through 100 {
+    $yPosFactor : 0;
+    @if ($i <= 30) {
+      $yPosFactor : dampedSineWave($i);
+    } @else {
+      $yPosFactor : 0;
+    }
+    $translateY : $yPosFactor * -10%;
+
+    #{$i}% {
+      transform: scale(1 / $numberOfPanels, 1) translateY(#{$translateY});
+    }
   }
 }
+// $waveApexPercentage : ($waveDuration / 2) / $totalDuration * 100;
+// $waveZenithPercentage : $waveDuration / $totalDuration * 100;
+// @keyframes shake {
+//   0% {
+//     transform: scale(1 / $numberOfPanels, 1) translateY(0);
+//   }
+//   #{$waveApexPercentage}% {
+//     transform: scale(1 / $numberOfPanels, 1) translateY($shakeMaxAmount * -1);
+//   }
+//   #{$waveZenithPercentage}% {
+//     transform: scale(1 / $numberOfPanels, 1) translateY(0);
+//   }
+// }
 
 /*
 =====================
