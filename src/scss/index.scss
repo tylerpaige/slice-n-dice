@@ -28,9 +28,13 @@ $colorPairs : (#B95E82, #B95E52), (#54ACC7, #9DB1FC), (#ADA13E, #5EA13E), (#173A
 .panel {
   transform: scale(1 / $numberOfPanels, 1);
   overflow: hidden;
+  z-index: 2;
 }
 .panel__inner {
   transform: scale($numberOfPanels, 1);
+}
+.panel__animater {
+  @include fullbleed();
 
   display: flex;
   flex-direction: column;
@@ -38,6 +42,15 @@ $colorPairs : (#B95E82, #B95E52), (#54ACC7, #9DB1FC), (#ADA13E, #5EA13E), (#173A
   align-items: center;
 }
 
+.content {
+  @include fullbleed();
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
 
 /*
 =====================
@@ -101,7 +114,7 @@ $wavePortion : $waveDuration / $totalDuration * 100;
   $x : ($i / $totalSteps) * $PI;
   @return sin($x);
 }
-.panel {
+.panel__animater {
   animation-name: shake;
   animation-duration: $totalDuration;
   animation-iteration-count: infinite;
@@ -109,7 +122,7 @@ $wavePortion : $waveDuration / $totalDuration * 100;
   animation-timing-function: linear;
 }
 @for $n from 1 through $numberOfPanels {
-  .panel:nth-child(#{$n}) {
+  .panel:nth-child(#{$n}) .panel__animater {
     animation-delay: $n * $delay;
   }
 }
@@ -119,7 +132,7 @@ $wavePortion : $waveDuration / $totalDuration * 100;
     $translateY : sineArc($i, $wavePortion) * -1 * $maxAmplitude;
 
     #{$i}% {
-      transform: scale(1 / $numberOfPanels, 1) translateY(#{$translateY});
+      transform: translateY(#{$translateY});
     }
   }
 }
@@ -130,14 +143,40 @@ COLOR CODING
 =====================
 */
 
-@for $n from 1 through $numberOfPanels {
-  $index : ($n % length($colorPairs)) + 1;
-  $colorPair : nth($colorPairs, $index);
-  $colorA : nth($colorPair, 1);
-  $colorB : nth($colorPair, 2);
-  .panel:nth-child(#{$n}) {
-    background-color: $colorA;
+// @for $n from 1 through $numberOfPanels {
+//   $index : ($n % length($colorPairs)) + 1;
+//   $colorPair : nth($colorPairs, $index);
+//   $colorA : nth($colorPair, 1);
+//   $colorB : nth($colorPair, 2);
+//   .panel:nth-child(#{$n}) {
+//     background-color: $colorA;
+//   }
+// }
+@function stripes($list) {
+  $value : ();
+  @for $i from 1 through length($list) {
+    $color : nth($list, $i);
+    $start : 100% / length($list) * ($i - 1);
+    $end : 100% / length($list) * $i;
+    $rampSegment : $color $start, $color $end;
+    $value : append($value, $rampSegment, comma);
   }
+  @return $value;
+}
+@function colorsToGradient() {
+  $Acolors : ();
+  @for $n from 1 through length($colorPairs) {
+    $colorPair : nth($colorPairs, $n);
+    $colorA : nth($colorPair, 1);
+    $Acolors : append($Acolors, $colorA)
+  }
+  $value : stripes($Acolors);
+  @return $value;
+}
+.container {
+  background-image: repeating-linear-gradient(90deg, #{colorsToGradient()});
+  background-repeat: repeat;
+  background-size: (100% / $numberOfPanels * length($colorPairs)) 100%;
 }
 
 /*
