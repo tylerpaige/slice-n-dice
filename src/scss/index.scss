@@ -91,7 +91,7 @@ $waitTime + $waveDurtion + $delay * $numberOfPanels
 
 $delay: 0.1s;
 $waveDuration : 5s;
-$waitTime: 5;
+$waitTime: 3;
 $maxAmplitude : 30%;
 
 $totalDuration : $waitTime + $waveDuration + $delay * $numberOfPanels;
@@ -142,7 +142,9 @@ $wavePortion : $waveDuration / $totalDuration * 100;
 COLOR CODING
 =====================
 */
-
+.container{
+  background: black;
+}
 // @for $n from 1 through $numberOfPanels {
 //   $index : ($n % length($colorPairs)) + 1;
 //   $colorPair : nth($colorPairs, $index);
@@ -152,32 +154,32 @@ COLOR CODING
 //     background-color: $colorA;
 //   }
 // }
-@function stripes($list) {
-  $value : ();
-  @for $i from 1 through length($list) {
-    $color : nth($list, $i);
-    $start : 100% / length($list) * ($i - 1);
-    $end : 100% / length($list) * $i;
-    $rampSegment : $color $start, $color $end;
-    $value : append($value, $rampSegment, comma);
-  }
-  @return $value;
-}
-@function colorsToGradient() {
-  $Acolors : ();
-  @for $n from 1 through length($colorPairs) {
-    $colorPair : nth($colorPairs, $n);
-    $colorA : nth($colorPair, 1);
-    $Acolors : append($Acolors, $colorA)
-  }
-  $value : stripes($Acolors);
-  @return $value;
-}
-.container {
-  background-image: repeating-linear-gradient(90deg, #{colorsToGradient()});
-  background-repeat: repeat;
-  background-size: (100% / $numberOfPanels * length($colorPairs)) 100%;
-}
+// @function stripes($list) {
+//   $value : ();
+//   @for $i from 1 through length($list) {
+//     $color : nth($list, $i);
+//     $start : 100% / length($list) * ($i - 1);
+//     $end : 100% / length($list) * $i;
+//     $rampSegment : $color $start, $color $end;
+//     $value : append($value, $rampSegment, comma);
+//   }
+//   @return $value;
+// }
+// @function colorsToGradient() {
+//   $Acolors : ();
+//   @for $n from 1 through length($colorPairs) {
+//     $colorPair : nth($colorPairs, $n);
+//     $colorA : nth($colorPair, 1);
+//     $Acolors : append($Acolors, $colorA)
+//   }
+//   $value : stripes($Acolors);
+//   @return $value;
+// }
+// .container {
+//   background-image: repeating-linear-gradient(90deg, #{colorsToGradient()});
+//   background-repeat: repeat;
+//   background-size: (100% / $numberOfPanels * length($colorPairs)) 100%;
+// }
 
 /*
 =====================
@@ -197,7 +199,45 @@ h3 {
   font-size: 5vw;
   font-weight: bold;
 }
-span {
-  background-color: #4ae4c3;
+p {
+  font-size: 25px;
+  font-weight: bold;
+  color: white;
+}
+span{
+  // background-color: #4ae4c3;
+  background-image: url('../img/noise-bg.gif');
   padding: 0.23em 0.35em 0;
+}
+
+
+.bar {
+  position: absolute;
+  width: 100%;
+  left: 0;
+  text-align: center;
+
+  &:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    left: 0;
+    display: block;
+    background-image: url('../img/noise-bg.gif');
+  }
+}
+.bar--top {
+  top: 0;
+
+  &:after {
+    bottom: -2px;
+  }
+}
+.bar--bottom {
+  bottom: 0;
+
+  &:after {
+    top: -2px;
+  }
 }
