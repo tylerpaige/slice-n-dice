@@ -58,9 +58,8 @@ POSITIONING
 ANIMATIONS
 =====================
 */
-
 $shakeMaxAmount : 1%;
-$totalDuration : 15s;
+$totalDuration : 3s;
 $waveDuration : 1s;
 @function dampedSineWave($x) {
   // @return sin(pow($x - $xOffset, 2)) / pow($x, 1.25);
@@ -70,6 +69,10 @@ $waveDuration : 1s;
   $c : 10;
   $d : 0;
   @return ($a / ($b + $x)) * sin((2 * $PI / $c) * $x) + $d; 
+}
+@function sineWave($i, $totalSteps : 100) {
+  $x : $i / $totalSteps * $PI;
+  @return sin($x);
 }
 .panel {
   animation-name: shake;
@@ -85,13 +88,7 @@ $waveDuration : 1s;
 }
 @keyframes shake {
   @for $i from 1 through 100 {
-    $yPosFactor : 0;
-    @if ($i <= 30) {
-      $yPosFactor : dampedSineWave($i);
-    } @else {
-      $yPosFactor : 0;
-    }
-    $translateY : $yPosFactor * -10%;
+    $translateY : sineWave($i) * -10%;
 
     #{$i}% {
       transform: scale(1 / $numberOfPanels, 1) translateY(#{$translateY});
